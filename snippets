@@ -77,3 +77,49 @@ for redirecting to a url:
  for refresh:
  -----------
  location.reload()
+ 
+ 
+ 
+ 
+ 
+ for cart checkout featores
+ ==========================
+ 
+ 
+ 
+ public function stored_data($identifier)
+    {
+        if ($identifier instanceof InstanceIdentifier) {
+            $identifier = $identifier->getInstanceIdentifier();
+        }
+
+        $currentInstance = $this->currentInstance();
+
+        if (!$this->storedCartInstanceWithIdentifierExists($currentInstance, $identifier)) {
+            return;
+        }
+
+        $stored = $this->getConnection()->table($this->getTableName())
+            ->where(['identifier'=> $identifier, 'instance' => $currentInstance])->first();
+
+        $storedContent = unserialize(data_get($stored, 'content'));
+
+        $this->instance(data_get($stored, 'instance'));
+
+        $content = $this->getContent();
+
+        foreach ($storedContent as $cartItem) {
+            $content->put($cartItem->rowId, $cartItem);
+        }
+
+        $this->events->dispatch('cart.restored');
+
+        $this->session->put($this->instance, $content);
+
+        $this->instance($currentInstance);
+
+        $this->createdAt = Carbon::parse(data_get($stored, 'created_at'));
+        $this->updatedAt = Carbon::parse(data_get($stored, 'updated_at'));
+
+        $this->getConnection()->table($this->getTableName())->where(['identifier' => $identifier, 'instance' => $currentInstance]);
+    }
