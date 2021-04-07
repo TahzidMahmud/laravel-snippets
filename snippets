@@ -87,7 +87,7 @@ for redirecting to a url:
  
  
  
- public function stored_data($identifier)
+   public function stored_data($identifier)
     {
         if ($identifier instanceof InstanceIdentifier) {
             $identifier = $identifier->getInstanceIdentifier();
@@ -121,5 +121,6 @@ for redirecting to a url:
         $this->createdAt = Carbon::parse(data_get($stored, 'created_at'));
         $this->updatedAt = Carbon::parse(data_get($stored, 'updated_at'));
 
-        $this->getConnection()->table($this->getTableName())->where(['identifier' => $identifier, 'instance' => $currentInstance]);
+      $data= $this->getConnection()->table($this->getTableName())->where(['identifier' => $identifier, 'instance' => $currentInstance])->get();
+        return $storedContent;
     }
